@@ -14,18 +14,25 @@ from .forms import RegistrationForm, LoginForm, ReviewForm, FeedbackForm
 @csrf_exempt
 @require_POST
 def vk_webhook(request):
+    print("=== VK WEBHOOK CALLED ===")
+    print(f"Request body: {request.body}")
+
     try:
         data = json.loads(request.body)
+        print(f"Parsed data: {data}")
 
         if data.get('type') == 'confirmation':
+            print("Confirmation request received")
             return HttpResponse('04b3e813', content_type='text/plain')
 
         if data.get('type') == 'message_new':
-            return JsonResponse({'ok': True})
+            print("New message received")
+            # ... остальной код
 
         return JsonResponse({'ok': True})
 
     except Exception as e:
+        print(f"Error: {e}")
         return JsonResponse({'error': str(e)}, status=400)
 
 def index(request):
