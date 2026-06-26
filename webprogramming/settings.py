@@ -97,4 +97,10 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
+VK_ACCESS_TOKEN = ('vk1.a.RuInSxw9RGXo2Jmw9pjarUWJG69D_7PE9ustJcocuSN'
+                   'Tg_Jbturex2vXkkvtMubYlJPCT8a6_tDcIOdLSAYuiSPV--uOgnt7F-'
+                   'uaxeB5eb-n07jvqLFBSWPLQc2V0yqeaqJqyB4NJgGOcyiPJNWM1F2_s_3Ir2t-'
+                   'KhMgRHDDD8Upp0sF7X1m2fDwFK3pmu25Qr3yyLTs0MZAJsMQR5S9vA')
 VK_CONFIRMATION_CODE = '04b3e813'
+VK_GROUP_ID = '239860707'
+VK_USER_ID = '131928387'
