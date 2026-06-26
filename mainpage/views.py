@@ -1,4 +1,5 @@
 import json
+from .vk_notify import send_vk_message
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
@@ -19,7 +20,25 @@ def vk_webhook(request):
         data = json.loads(request.body)
 
         if data.get('type') == 'confirmation':
-            return JsonResponse({'response': settings.VK_CONFIRMATION_CODE})
+            confirmation_code = getattr(settings, 'VK_CONFIRMATION_CODE', '04b3e813')
+            return JsonResponse({'response': confirmation_code})
+
+        if data.get('type') == 'message_new':
+            message = data.get('object', {}).get('message', {})
+            user_id = message.get('from_id')
+            text = message.get('text', '')
+
+            from .vk_notify import send_vk_message
+            send_vk_message(user_id, "Ваше сообщение получено!")
+
+            return JsonResponse({'ok': True})
+
+        return JsonResponse({'ok': True})
+
+    except json.JSONDecodeError:
+        return JsonResponse({'error': 'Invalid JSON'}, status=400)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=400)
 
 def index(request):
     top_products = Product.objects.annotate(
