@@ -14,20 +14,35 @@ from .forms import RegistrationForm, LoginForm, ReviewForm, FeedbackForm
 @csrf_exempt
 @require_POST
 def vk_webhook(request):
-    print("=== VK WEBHOOK CALLED ===")
-    print(f"Request body: {request.body}")
-
     try:
         data = json.loads(request.body)
-        print(f"Parsed data: {data}")
 
         if data.get('type') == 'confirmation':
-            print("Confirmation request received")
             return HttpResponse('04b3e813', content_type='text/plain')
 
         if data.get('type') == 'message_new':
-            print("New message received")
-            # ... остальной код
+            message = data.get('object', {}).get('message', {})
+            user_id = message.get('from_id')
+            text = message.get('text', '')
+
+            print(f"Message from {user_id}: {text}")
+
+            # Ответ
+            if text.lower() == 'привет':
+                response = 'Привет! Это бот Apex!'
+            elif text.lower() == 'помощь':
+                response = 'Команды:\n- Привет\n- Помощь\n- Товары\n- Контакты'
+            elif text.lower() == 'товары':
+                response = 'Смотрите каталог: https://ваш-проект.up.railway.app/catalog/'
+            elif text.lower() == 'контакты':
+                response = 'Наши контакты:\nEmail: info@apex.ru\nТелефон: +7 (999) 123-45-67'
+            else:
+                response = 'Спасибо за сообщение! Напишите "Помощь" для списка команд.'
+
+            from .vk_notify import send_vk_message
+            send_vk_message(user_id, response)
+
+            return JsonResponse({'ok': True})
 
         return JsonResponse({'ok': True})
 
