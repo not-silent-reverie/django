@@ -16,34 +16,28 @@ from .forms import RegistrationForm, LoginForm, ReviewForm, FeedbackForm
 def vk_webhook(request):
     try:
         data = json.loads(request.body)
+        print(f"=== VK WEBHOOK ===")
+        print(f"Type: {data.get('type')}")
 
         if data.get('type') == 'confirmation':
+            print("Confirmation received")
             return HttpResponse('04b3e813', content_type='text/plain')
 
         if data.get('type') == 'message_new':
+            print("Message received")
             message = data.get('object', {}).get('message', {})
             user_id = message.get('from_id')
             text = message.get('text', '')
 
-            print(f"Message from {user_id}: {text}")
-
-            # Ответ
-            if text.lower() == 'привет':
-                response = 'Привет! Это бот Apex!'
-            elif text.lower() == 'помощь':
-                response = 'Команды:\n- Привет\n- Помощь\n- Товары\n- Контакты'
-            elif text.lower() == 'товары':
-                response = 'Смотрите каталог: https://ваш-проект.up.railway.app/catalog/'
-            elif text.lower() == 'контакты':
-                response = 'Наши контакты:\nEmail: info@apex.ru\nТелефон: +7 (999) 123-45-67'
-            else:
-                response = 'Спасибо за сообщение! Напишите "Помощь" для списка команд.'
+            print(f"From: {user_id}, Text: {text}")
 
             from .vk_notify import send_vk_message
+            response = f"Вы написали: {text}"
             send_vk_message(user_id, response)
 
             return JsonResponse({'ok': True})
 
+        print(f"Unknown type: {data.get('type')}")
         return JsonResponse({'ok': True})
 
     except Exception as e:
