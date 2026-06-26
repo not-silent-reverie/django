@@ -19,18 +19,29 @@ def vk_webhook(request):
     try:
         data = json.loads(request.body)
 
+
         if data.get('type') == 'confirmation':
-            confirmation_code = getattr(settings, 'VK_CONFIRMATION_CODE', '04b3e813')
-            return JsonResponse({'response': confirmation_code})
+            return JsonResponse({'response': '04b3e813'})
+
 
         if data.get('type') == 'message_new':
             message = data.get('object', {}).get('message', {})
             user_id = message.get('from_id')
             text = message.get('text', '')
 
-            from .vk_notify import send_vk_message
-            send_vk_message(user_id, "Ваше сообщение получено!")
 
+            if text.lower() == 'привет':
+                response = 'Привет! Это бот Apex!'
+            elif text.lower() == 'помощь':
+                response = 'Команды:\n- Привет\n- Помощь\n- Товары\n- Контакты'
+            elif text.lower() == 'товары':
+                response = 'Смотрите каталог: https://ваш-проект.up.railway.app/catalog/'
+            elif text.lower() == 'контакты':
+                response = 'Наши контакты:\nEmail: info@apex.ru\nТелефон: +7 (999) 123-45-67'
+            else:
+                response = 'Спасибо за сообщение! Напишите "Помощь" для списка команд.'
+
+            send_vk_message(user_id, response)
             return JsonResponse({'ok': True})
 
         return JsonResponse({'ok': True})
