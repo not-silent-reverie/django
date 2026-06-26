@@ -5,11 +5,21 @@ from django.views.decorators.http import require_POST
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.db.models import Avg, Count
 from .models import Product, Review
 from .forms import RegistrationForm, LoginForm, ReviewForm
 
+
+@csrf_exempt
+@require_POST
+def vk_webhook(request):
+    try:
+        data = json.loads(request.body)
+
+        if data.get('type') == 'confirmation':
+            return JsonResponse({'response': settings.VK_CONFIRMATION_CODE})
 
 def index(request):
     top_products = Product.objects.annotate(
