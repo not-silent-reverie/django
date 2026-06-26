@@ -2,7 +2,9 @@ from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.core.validators import RegexValidator
-from .models import Review
+from .models import (
+    Category, Product, Review, Profile
+)
 import re
 
 class ReviewForm(forms.ModelForm):
@@ -92,6 +94,30 @@ class RegistrationForm(UserCreationForm):
         if not re.match(r'^[A-ZА-Я][a-zа-я]*$', last_name):
             raise forms.ValidationError('Фамилия должна начинаться с заглавной буквы и содержать только буквы')
         return last_name
+
+    def clean_password1(self):
+        password1 = self.cleaned_data.get('password1')
+        if len(password1) < 8:
+            raise forms.ValidationError('Пароль должен содержать минимум 8 символов')
+        if not any(c.isdigit() for c in password1):
+            raise forms.ValidationError('Пароль должен содержать хотя бы одну цифру')
+        if not any(c.isupper() for c in password1):
+            raise forms.ValidationError('Пароль должен содержать хотя бы одну заглавную букву')
+        return password1
+
+    def clean_password2(self):
+        password1 = self.cleaned_data.get('password1')
+        password2 = self.cleaned_data.get('password2')
+        if password1 and password2 and password1 != password2:
+            raise forms.ValidationError('Пароли не совпадают')
+        return password2
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        if commit:
+            user.save()
+            Profile.objects.create(user=user)
+        return user
 
 class LoginForm(AuthenticationForm):
     username = forms.CharField(

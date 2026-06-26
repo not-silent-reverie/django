@@ -79,10 +79,11 @@ def register_view(request):
             login(request, user)
             messages.success(request, 'Регистрация успешна! Добро пожаловать!')
             return redirect('index')
+        else:
+            messages.error(request, 'Пожалуйста, исправьте ошибки в форме')
     else:
         form = RegistrationForm()
     return render(request, 'mainpage/register.html', {'form': form})
-
 
 def login_view(request):
     if request.method == 'POST':
