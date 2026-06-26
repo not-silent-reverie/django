@@ -1,7 +1,8 @@
 from django import forms
-from .models import Review
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.core.validators import RegexValidator, EmailValidator
+from .models import Review
 import re
 
 class ReviewForm(forms.ModelForm):
@@ -103,5 +104,51 @@ class LoginForm(AuthenticationForm):
         widget=forms.PasswordInput(attrs={
             'class': 'form-input',
             'placeholder': 'Введите пароль'
+        })
+    )
+
+
+class FeedbackForm(forms.Form):
+    name = forms.CharField(
+        max_length=100,
+        required=True,
+        widget=forms.TextInput(attrs={
+            'class': 'form-input',
+            'placeholder': 'Ваше имя'
+        })
+    )
+
+    email = forms.EmailField(
+        required=True,
+        widget=forms.EmailInput(attrs={
+            'class': 'form-input',
+            'placeholder': 'Ваш email'
+        })
+    )
+
+    phone = forms.CharField(
+        max_length=20,
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'form-input',
+            'placeholder': '+7 (___) ___-__-__'
+        })
+    )
+
+    subject = forms.CharField(
+        max_length=200,
+        required=True,
+        widget=forms.TextInput(attrs={
+            'class': 'form-input',
+            'placeholder': 'Тема сообщения'
+        })
+    )
+
+    message = forms.CharField(
+        required=True,
+        widget=forms.Textarea(attrs={
+            'class': 'form-input',
+            'rows': 5,
+            'placeholder': 'Ваше сообщение'
         })
     )

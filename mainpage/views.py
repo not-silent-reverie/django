@@ -1,5 +1,6 @@
 import json
 from .vk_notify import send_vk_message
+from .forms import FeedbackForm
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
@@ -147,3 +148,15 @@ def logout_view(request):
     messages.success(request, 'Вы вышли из системы')
     return redirect('index')
 
+def feedback_view(request):
+    if request.method == 'POST':
+        form = FeedbackForm(request.POST)
+        if form.is_valid():
+            messages.success(request, 'Сообщение отправлено!')
+            return redirect('index')
+    else:
+        form = FeedbackForm()
+    return render(request, 'mainpage/feedback.html', {'form': form})
+
+def feedback_success(request):
+    return render(request, 'mainpage/feedback_success.html')
