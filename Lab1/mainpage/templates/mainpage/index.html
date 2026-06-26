@@ -1,0 +1,152 @@
+{% extends 'mainpage/base.html' %}
+{% load static %}
+
+{% block title %}Главная - Apex{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    <h1 class="header-title">Добро пожаловать в Apex!</h1>
+    <h2 class="header-subtitle">Лучшие товары по лучшим ценам</h2>
+    <h3 style="color: #ff0080;">🔥 Горячие новинки</h3>
+    <h4 style="color: #80ff00;">⭐ Скидки до 50%</h4>
+    <h5 style="color: #666;">🛒 Бесплатная доставка</h5>
+    <h6 style="color: #999;">*Акция действует до конца месяца</h6>
+
+    <p>
+        <span style="color: #ff0080; font-weight: bold;">Добро пожаловать</span> в <strong>Apex</strong> — ваш надежный интернет-магазин!
+        Мы предлагаем <span style="color: #80ff00;">широкий ассортимент</span> товаров для всей семьи.
+    </p>
+
+    <p>
+        <em>Низкие цены</em> и <strong>высокое качество</strong> — наш главный приоритет.
+        <em style="color: #ff0080;">Спешите</em>, количество товаров <strong style="color: #80ff00;">ограничено</strong>!
+    </p>
+
+    <br/>
+
+    <!-- ТОП-3 ТОВАРА ПО РЕЙТИНГУ -->
+    <div class="top-products-section">
+        <h2 class="section-title">🏆 Топ товаров по рейтингу</h2>
+        <div class="top-products-grid">
+            {% for product in top_products %}
+            <div class="top-product-card">
+                <div class="top-product-rank">
+                    <span class="rank-number">#{{ forloop.counter }}</span>
+                    {% if forloop.counter == 1 %}
+                        <span class="rank-medal">🥇</span>
+                    {% elif forloop.counter == 2 %}
+                        <span class="rank-medal">🥈</span>
+                    {% elif forloop.counter == 3 %}
+                        <span class="rank-medal">🥉</span>
+                    {% endif %}
+                </div>
+
+                {% if product.image %}
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}" class="top-product-image">
+                {% else %}
+                    <img src="/media/products/default.jpg" alt="{{ product.name }}" class="top-product-image">
+                {% endif %}
+
+                <h3>{{ product.name }}</h3>
+
+                <div class="product-rating">
+                    <span class="stars">
+                        {% with rating=product.average_rating|floatformat:"0" %}
+                            {% for i in "12345"|make_list %}
+                                {% if forloop.counter <= rating|add:"0" %}
+                                    ★
+                                {% else %}
+                                    ☆
+                                {% endif %}
+                            {% endfor %}
+                        {% endwith %}
+                    </span>
+                    <span class="rating-value">{{ product.average_rating|floatformat:1 }}</span>
+                    <span class="reviews-count">({{ product.reviews_count }} отзывов)</span>
+                </div>
+
+                <p class="product-price">{{ product.price }} ₽</p>
+                <p class="product-desc">{{ product.description|truncatechars:60 }}</p>
+
+                <a href="{% url 'product_detail' product.id %}" class="btn-detail">Подробнее →</a>
+            </div>
+            {% empty %}
+            <p class="no-products">Пока нет товаров с оценками. Добавьте товары и отзывы!</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Списки преимуществ -->
+    <div class="lists-container">
+        <div class="list-block">
+            <h3>Наши преимущества:</h3>
+            <ol>
+                <li>Высокое качество товаров</li>
+                <li>Быстрая доставка</li>
+                <li>Гарантия возврата</li>
+                <li>Круглосуточная поддержка</li>
+            </ol>
+        </div>
+        <div class="list-block">
+            <h3>Категории товаров:</h3>
+            <ul>
+                <li>Электроника</li>
+                <li>Одежда</li>
+                <li>Дом и сад</li>
+                <li>Спорт и отдых</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- ВИДЕО-ОБЗОРЫ -->
+    <div class="media-section">
+        <h3>Видео-обзоры</h3>
+
+        <div class="video-gallery">
+            <div class="video-card">
+                <h4>Обзор смартфона X200</h4>
+                <div class="video-wrapper">
+                    <video controls>
+                        <source src="{% static 'mainpage/videos/smartphone.mp4' %}" type="video/mp4">
+                        Ваш браузер не поддерживает видео.
+                    </video>
+                </div>
+                <div class="video-actions">
+                    <a href="{% static 'mainpage/videos/smartphone.mp4' %}" target="_blank" class="btn-video">Открыть</a>
+                    <a href="{% static 'mainpage/videos/smartphone.mp4' %}" download class="btn-video">Скачать</a>
+                </div>
+            </div>
+
+            <div class="video-card">
+                <h4>Обзор ноутбука Gaming</h4>
+                <div class="video-wrapper">
+                    <iframe src="https://rutube.ru/play/embed/de6fe7c958fded34d8580cd591a49717/"
+                            width="100%"
+                            height="315"
+                            frameborder="0"
+                            allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
+                            allowfullscreen>
+                    </iframe>
+                </div>
+                <div class="video-actions">
+                    <a href="https://rutube.ru/play/embed/de6fe7c958fded34d8580cd591a49717/" target="_blank" class="btn-video">Смотреть на RuTube</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Якорные ссылки -->
+    <div class="anchor-section">
+        <h3>Навигация по странице</h3>
+        <a href="#top" class="anchor-link">↑ Наверх</a>
+        <a href="#catalog-preview" class="anchor-link">↓ К каталогу</a>
+    </div>
+
+    <!-- Каталог-превью -->
+    <div id="catalog-preview" class="catalog-preview">
+        <h3>Популярные товары</h3>
+        <p>Перейдите в <a href="{% url 'catalog' %}" style="color: #ff0080; font-weight: bold;">каталог</a> для просмотра всех товаров.</p>
+        <a href="{% url 'catalog' %}" class="btn-catalog">Перейти в каталог →</a>
+    </div>
+</div>
+{% endblock %}

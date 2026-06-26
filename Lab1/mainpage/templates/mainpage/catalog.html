@@ -1,0 +1,50 @@
+{% extends 'mainpage/base.html' %}
+{% load static %}
+
+{% block title %}Каталог - Apex{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    <h1 class="header-title">Каталог товаров</h1>
+    <h2 class="header-subtitle">Выберите свой идеальный товар</h2>
+    <br/>
+
+    <div class="catalog-grid">
+        {% for product in products %}
+        <div class="product-card">
+            {% if product.image %}
+                <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-card-image">
+            {% else %}
+                <img src="/media/products/default.jpg" alt="{{ product.name }}" class="product-card-image">
+            {% endif %}
+
+            <h3>{{ product.name }}</h3>
+
+            <!-- Отображение рейтинга -->
+            <div class="product-rating">
+                <span class="stars">
+                    {% with rating=product.average_rating|floatformat:"0" %}
+                        {% for i in "12345"|make_list %}
+                            {% if forloop.counter <= rating|add:"0" %}
+                                ★
+                            {% else %}
+                                ☆
+                            {% endif %}
+                        {% endfor %}
+                    {% endwith %}
+                </span>
+                <span class="rating-value">{{ product.average_rating|floatformat:1 }}</span>
+                <span class="reviews-count">({{ product.reviews_count }} отзывов)</span>
+            </div>
+
+            <p class="product-price">{{ product.price }} ₽</p>
+            <p class="product-desc">{{ product.description|truncatechars:80 }}</p>
+
+            <a href="{% url 'product_detail' product.id %}" class="btn-detail">Подробнее →</a>
+        </div>
+        {% empty %}
+        <p>Товаров пока нет.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

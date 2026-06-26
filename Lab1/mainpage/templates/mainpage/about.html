@@ -1,0 +1,48 @@
+{% extends 'mainpage/base.html' %}
+{% load static %}
+
+{% block title %}О нас - Apex{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    <h1 class="header-title">О компании Apex</h1>
+    <h2 class="header-subtitle">Кто мы и чем занимаемся</h2>
+    <br/>
+
+    <div style="background: #f5f5f5; padding: 20px; border-radius: 10px; border-left: 5px solid #ff0080;">
+        <p style="font-size: 18px;">
+            <span style="color: #ff0080; font-weight: bold;">Apex</span> — это команда профессионалов,
+            которая <span style="color: #80ff00; font-weight: bold;">любит</span> свою работу.
+            Наш интернет-магазин работает с <em>2015 года</em>.
+        </p>
+        <p>
+            <strong>Наша миссия:</strong> сделать покупки удобными и доступными для каждого.
+        </p>
+    </div>
+
+    <div style="margin-top: 30px; display: flex; gap: 30px; flex-wrap: wrap;">
+        <div style="background: white; padding: 20px; border-radius: 10px; border: 2px solid #80ff00; flex: 1; min-width: 200px;">
+            <h4 style="color: #ff0080;">🌟 Наши ценности</h4>
+            <ul>
+                <li>Честность</li>
+                <li>Качество</li>
+                <li>Клиентоориентированность</li>
+            </ul>
+        </div>
+        <div style="background: white; padding: 20px; border-radius: 10px; border: 2px solid #ff0080; flex: 1; min-width: 200px;">
+            <h4 style="color: #80ff00;">📞 Контакты</h4>
+            <p>Телефон: +7 (999) 123-45-67</p>
+            <p>Email: info@apex.ru</p>
+            <p>Адрес: г. Москва, ул. Примерная, д. 1</p>
+        </div>
+    </div>
+
+    <!-- Блок с изображением УДАЛЕН -->
+
+    <div style="margin-top: 30px;">
+        <a href="{% url 'index' %}" style="color: #ff0080; text-decoration: none; border: 2px solid #ff0080; padding: 10px 20px; border-radius: 5px; transition: all 0.3s ease;"
+           onmouseover="this.style.background='#ff0080'; this.style.color='white';"
+           onmouseout="this.style.background='transparent'; this.style.color='#ff0080';">← На главную</a>
+    </div>
+</div>
+{% endblock %}

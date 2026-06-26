@@ -1,0 +1,110 @@
+{% extends 'mainpage/base.html' %}
+{% load static %}
+
+{% block title %}{{ product.name }} - Apex{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    <div class="product-detail">
+        <div class="product-detail-header">
+            <a href="{% url 'catalog' %}" class="back-link">← Назад к каталогу</a>
+        </div>
+        
+        <div class="product-detail-content">
+            <div class="product-detail-image">
+                {% if product.image %}
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                {% else %}
+                    <img src="/media/products/default.jpg" alt="{{ product.name }}">
+                {% endif %}
+            </div>
+
+            <div class="product-detail-info">
+                <h1>{{ product.name }}</h1>
+
+                <!-- Рейтинг -->
+                <div class="product-rating-large">
+                    <span class="stars-large">
+                        {% with rating=average_rating|floatformat:"0" %}
+                            {% for i in "12345"|make_list %}
+                                {% if forloop.counter <= rating|add:"0" %}
+                                    ★
+                                {% else %}
+                                    ☆
+                                {% endif %}
+                            {% endfor %}
+                        {% endwith %}
+                    </span>
+                    <span class="rating-value-large">{{ average_rating|floatformat:1 }}</span>
+                    <span class="reviews-count-large">({{ reviews_count }} отзывов)</span>
+                </div>
+
+                <div class="product-price-large">{{ product.price }} ₽</div>
+
+                <div class="product-description-full">
+                    <h3>Описание</h3>
+                    <p>{{ product.description }}</p>
+                </div>
+
+                <button class="btn-buy-large">Добавить в корзину</button>
+            </div>
+        </div>
+
+        <!-- Отзывы (остается без изменений) -->
+        <div class="reviews-section">
+            <h3>Отзывы ({{ reviews_count }})</h3>
+
+            {% if user.is_authenticated %}
+                <div class="review-form-container">
+                    <h4>Оставить отзыв</h4>
+                    <form method="post" class="review-form">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label>{{ form.rating.label }}</label>
+                            <div class="rating-input">
+                                {% for radio in form.rating %}
+                                    <label class="rating-option">
+                                        {{ radio.tag }} {{ radio.choice_label }}
+                                    </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>{{ form.comment.label }}</label>
+                            {{ form.comment }}
+                        </div>
+                        <button type="submit" class="btn-submit-review">Отправить отзыв</button>
+                    </form>
+                </div>
+            {% else %}
+                <p class="login-to-review">
+                    <a href="{% url 'admin:login' %}?next={{ request.path }}">Войдите</a>, чтобы оставить отзыв.
+                </p>
+            {% endif %}
+
+            <div class="reviews-list">
+                {% for review in reviews %}
+                    <div class="review-item">
+                        <div class="review-header">
+                            <strong class="review-user">{{ review.user.username }}</strong>
+                            <span class="review-rating">
+                                {% for i in "12345"|make_list %}
+                                    {% if forloop.counter <= review.rating %}
+                                        ★
+                                    {% else %}
+                                        ☆
+                                    {% endif %}
+                                {% endfor %}
+                            </span>
+                            <span class="review-date">{{ review.created_at|date:"d.m.Y H:i" }}</span>
+                        </div>
+                        <div class="review-comment">{{ review.comment }}</div>
+                    </div>
+                {% empty %}
+                    <p class="no-reviews">Пока нет отзывов. Будьте первым!</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

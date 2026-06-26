@@ -1,0 +1,66 @@
+{% extends 'mainpage/base.html' %}
+{% load static %}
+
+{% block title %}Регистрация - Apex{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-box">
+        <h1 class="auth-title">Регистрация</h1>
+        <p class="auth-subtitle">Создайте аккаунт в Apex</p>
+
+        <form method="post" class="auth-form" id="registerForm" novalidate>
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="{{ form.first_name.id_for_label }}">Имя</label>
+                {{ form.first_name }}
+                <span class="form-error" id="first_name_error"></span>
+                <span class="form-hint">Только буквы, первая заглавная</span>
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.last_name.id_for_label }}">Фамилия</label>
+                {{ form.last_name }}
+                <span class="form-error" id="last_name_error"></span>
+                <span class="form-hint">Только буквы, первая заглавная</span>
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.username.id_for_label }}">Логин</label>
+                {{ form.username }}
+                <span class="form-error" id="username_error"></span>
+                <span class="form-hint">От 3 до 150 символов</span>
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.email.id_for_label }}">Email</label>
+                {{ form.email }}
+                <span class="form-error" id="email_error"></span>
+                <span class="form-hint">example@mail.com</span>
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.password1.id_for_label }}">Пароль</label>
+                {{ form.password1 }}
+                <span class="form-error" id="password1_error"></span>
+                <span class="form-hint">Минимум 8 символов</span>
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.password2.id_for_label }}">Подтверждение пароля</label>
+                {{ form.password2 }}
+                <span class="form-error" id="password2_error"></span>
+            </div>
+
+            <button type="submit" class="btn-auth">Зарегистрироваться</button>
+        </form>
+
+        <p class="auth-link">
+            Уже есть аккаунт? <a href="{% url 'login' %}">Войти</a>
+        </p>
+    </div>
+</div>
+
+<script src="{% static 'mainpage/js/validation.js' %}"></script>
+{% endblock %}

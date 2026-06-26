@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Apex{% endblock %}</title>
+
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'mainpage/css/style.css' %}">
+</head>
+<body>
+    <nav class="fixed-menu">
+        <div class="menu-container">
+            <div class="logo">
+                <span class="brand-apex">Apex</span><span class="brand-dot">.</span>
+            </div>
+            <ul class="menu-list">
+                <li><a href="{% url 'index' %}">Главная</a></li>
+                <li><a href="{% url 'catalog' %}">Каталог</a></li>
+                <li><a href="{% url 'about' %}">О нас</a></li>
+                {% if user.is_authenticated %}
+                    <li><span style="color: #ff0080;">{{ user.username }}</span></li>
+                    <li><a href="{% url 'logout' %}">Выйти</a></li>
+                {% else %}
+                    <li><a href="{% url 'login' %}">Войти</a></li>
+                    <li><a href="{% url 'register' %}">Регистрация</a></li>
+                {% endif %}
+            </ul>
+            <div class="menu-toggle">☰</div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="message {{ message.tags }}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    <footer class="footer">
+        <p>&copy; 2026 Apex. Все права защищены.</p>
+    </footer>
+
+    <script>
+        document.querySelector('.menu-toggle').addEventListener('click', function() {
+            document.querySelector('.menu-list').classList.toggle('active');
+        });
+    </script>
+</body>
+</html>
