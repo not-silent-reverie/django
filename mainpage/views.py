@@ -1,17 +1,14 @@
 import json
 from .vk_notify import send_vk_message
-from .forms import FeedbackForm
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
-from django.conf import settings
-from django.contrib.auth.decorators import login_required
 from django.db.models import Avg, Count
-from .models import Product, Review
-from .forms import RegistrationForm, LoginForm, ReviewForm
+from .models import Product
+from .forms import RegistrationForm, LoginForm, ReviewForm, FeedbackForm
 
 
 @csrf_exempt
@@ -20,35 +17,14 @@ def vk_webhook(request):
     try:
         data = json.loads(request.body)
 
-
         if data.get('type') == 'confirmation':
-            return JsonResponse({'response': '04b3e813'})
-
+            return HttpResponse('04b3e813', content_type='text/plain')
 
         if data.get('type') == 'message_new':
-            message = data.get('object', {}).get('message', {})
-            user_id = message.get('from_id')
-            text = message.get('text', '')
-
-
-            if text.lower() == 'привет':
-                response = 'Привет! Это бот Apex!'
-            elif text.lower() == 'помощь':
-                response = 'Команды:\n- Привет\n- Помощь\n- Товары\n- Контакты'
-            elif text.lower() == 'товары':
-                response = 'Смотрите каталог: https://ваш-проект.up.railway.app/catalog/'
-            elif text.lower() == 'контакты':
-                response = 'Наши контакты:\nEmail: info@apex.ru\nТелефон: +7 (999) 123-45-67'
-            else:
-                response = 'Спасибо за сообщение! Напишите "Помощь" для списка команд.'
-
-            send_vk_message(user_id, response)
             return JsonResponse({'ok': True})
 
         return JsonResponse({'ok': True})
 
-    except json.JSONDecodeError:
-        return JsonResponse({'error': 'Invalid JSON'}, status=400)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=400)
 
