@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from django.core.validators import RegexValidator, EmailValidator
+from django.core.validators import RegexValidator
 from .models import Review
 import re
 
@@ -115,7 +115,13 @@ class FeedbackForm(forms.Form):
         widget=forms.TextInput(attrs={
             'class': 'form-input',
             'placeholder': 'Ваше имя'
-        })
+        }),
+        validators=[
+            RegexValidator(
+                r'^[A-ZА-Я][a-zа-я]*$',
+                'Имя должно начинаться с заглавной буквы и содержать только буквы'
+            )
+        ]
     )
 
     email = forms.EmailField(

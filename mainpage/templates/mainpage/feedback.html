@@ -1,0 +1,108 @@
+{% extends 'mainpage/base.html' %}
+{% load static %}
+
+{% block title %}Обратная связь - Apex{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-box">
+        <h1 class="auth-title">📩 Обратная связь</h1>
+        <p class="auth-subtitle">Напишите нам, и мы ответим в ближайшее время</p>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="message {{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="post" class="auth-form" id="feedbackForm" novalidate>
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="id_name">Имя</label>
+                <input type="text" name="name" id="id_name" 
+                       class="form-input" 
+                       placeholder="Ваше имя"
+                       required>
+                <span class="form-error" id="name_error"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="id_email">Email</label>
+                <input type="email" name="email" id="id_email" 
+                       class="form-input" 
+                       placeholder="your@email.com"
+                       required>
+                <span class="form-error" id="email_error"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="id_phone">Телефон (необязательно)</label>
+                <input type="tel" name="phone" id="id_phone" 
+                       class="form-input" 
+                       placeholder="+7 (___) ___-__-__">
+                <span class="form-error" id="phone_error"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="id_subject">Тема</label>
+                <input type="text" name="subject" id="id_subject" 
+                       class="form-input" 
+                       placeholder="Тема сообщения"
+                       required>
+                <span class="form-error" id="subject_error"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="id_message">Сообщение</label>
+                <textarea name="message" id="id_message" 
+                          class="form-input" 
+                          rows="5" 
+                          placeholder="Ваше сообщение"
+                          required></textarea>
+                <span class="form-error" id="message_error"></span>
+            </div>
+
+            <button type="submit" class="btn-auth">📤 Отправить</button>
+        </form>
+
+        <p class="auth-link">
+            <a href="{% url 'index' %}">← Вернуться на главную</a>
+        </p>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('feedbackForm');
+    
+    document.getElementById('id_name').addEventListener('input', function() {
+        const error = document.getElementById('name_error');
+        const nameRegex = /^[A-ZА-Я][a-zа-я]*$/;
+        if (this.value && !nameRegex.test(this.value)) {
+            error.textContent = 'Только буквы, первая заглавная';
+            this.classList.add('invalid');
+        } else {
+            error.textContent = '';
+            this.classList.remove('invalid');
+            this.classList.add('valid');
+        }
+    });
+    
+    document.getElementById('id_email').addEventListener('input', function() {
+        const error = document.getElementById('email_error');
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (this.value && !emailRegex.test(this.value)) {
+            error.textContent = 'Введите корректный email';
+            this.classList.add('invalid');
+        } else {
+            error.textContent = '';
+            this.classList.remove('invalid');
+            this.classList.add('valid');
+        }
+    });
+});
+</script>
+{% endblock %}

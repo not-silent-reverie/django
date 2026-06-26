@@ -18,6 +18,7 @@
                 <li><a href="{% url 'index' %}">Главная</a></li>
                 <li><a href="{% url 'catalog' %}">Каталог</a></li>
                 <li><a href="{% url 'about' %}">О нас</a></li>
+                <li><a href="{% url 'feedback' %}">📩 Связь</a></li>
                 {% if user.is_authenticated %}
                     <li><span style="color: #ff0080;">{{ user.username }}</span></li>
                     <li><a href="{% url 'logout' %}">Выйти</a></li>

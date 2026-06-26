@@ -1,0 +1,158 @@
+{
+  "info": {
+    "name": "VK API - Обратная связь",
+    "description": "Коллекция запросов для демонстрации работы с VK API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Отправка сообщения пользователю",
+      "request": {
+        "method": "POST",
+        "url": {
+          "raw": "https://api.vk.com/method/messages.send",
+          "host": ["api", "vk", "com"],
+          "path": ["method", "messages.send"]
+        },
+        "body": {
+          "mode": "urlencoded",
+          "urlencoded": [
+            {"key": "user_id", "value": "131928387"},
+            {"key": "message", "value": "Тестовое сообщение из Postman"},
+            {"key": "access_token", "value": "{{vk_token}}"},
+            {"key": "v", "value": "5.199"},
+            {"key": "random_id", "value": "0"}
+          ]
+        }
+      }
+    },
+    {
+      "name": "2. Получение информации о пользователе",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "https://api.vk.com/method/users.get?user_ids={{user_id}}&fields=first_name,last_name,photo_100&access_token={{vk_token}}&v=5.199",
+          "host": ["api", "vk", "com"],
+          "path": ["method", "users.get"],
+          "query": [
+            {"key": "user_ids", "value": "{{user_id}}"},
+            {"key": "fields", "value": "first_name,last_name,photo_100"},
+            {"key": "access_token", "value": "{{vk_token}}"},
+            {"key": "v", "value": "5.199"}
+          ]
+        }
+      }
+    },
+    {
+      "name": "3. Получение диалогов",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "https://api.vk.com/method/messages.getConversations?count=5&access_token={{vk_token}}&v=5.199",
+          "host": ["api", "vk", "com"],
+          "path": ["method", "messages.getConversations"],
+          "query": [
+            {"key": "count", "value": "5"},
+            {"key": "access_token", "value": "{{vk_token}}"},
+            {"key": "v", "value": "5.199"}
+          ]
+        }
+      }
+    },
+    {
+      "name": "4. Отправка сообщения в группу",
+      "request": {
+        "method": "POST",
+        "url": {
+          "raw": "https://api.vk.com/method/messages.send",
+          "host": ["api", "vk", "com"],
+          "path": ["method", "messages.send"]
+        },
+        "body": {
+          "mode": "urlencoded",
+          "urlencoded": [
+            {"key": "peer_id", "value": "-239860707"},
+            {"key": "message", "value": "Новая заявка с сайта!"},
+            {"key": "access_token", "value": "{{vk_token}}"},
+            {"key": "v", "value": "5.199"},
+            {"key": "random_id", "value": "0"}
+          ]
+        }
+      }
+    },
+    {
+      "name": "5. Отправка сообщения с клавиатурой",
+      "request": {
+        "method": "POST",
+        "url": {
+          "raw": "https://api.vk.com/method/messages.send",
+          "host": ["api", "vk", "com"],
+          "path": ["method", "messages.send"]
+        },
+        "body": {
+          "mode": "urlencoded",
+          "urlencoded": [
+            {"key": "user_id", "value": "{{user_id}}"},
+            {"key": "message", "value": "Выберите действие:"},
+            {"key": "keyboard", "value": "{\"one_time\":true,\"buttons\":[[{\"action\":{\"type\":\"text\",\"label\":\"Товары\"},\"color\":\"primary\"},{\"action\":{\"type\":\"text\",\"label\":\"Контакты\"},\"color\":\"secondary\"}],[{\"action\":{\"type\":\"text\",\"label\":\"Помощь\"},\"color\":\"negative\"}]]}"},
+            {"key": "access_token", "value": "{{vk_token}}"},
+            {"key": "v", "value": "5.199"},
+            {"key": "random_id", "value": "0"}
+          ]
+        }
+      }
+    },
+    {
+      "name": "6. Получение информации о сообществе",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "https://api.vk.com/method/groups.getById?group_id={{group_id}}&fields=name,description,photo_200&access_token={{vk_token}}&v=5.199",
+          "host": ["api", "vk", "com"],
+          "path": ["method", "groups.getById"],
+          "query": [
+            {"key": "group_id", "value": "{{group_id}}"},
+            {"key": "fields", "value": "name,description,photo_200"},
+            {"key": "access_token", "value": "{{vk_token}}"},
+            {"key": "v", "value": "5.199"}
+          ]
+        }
+      }
+    },
+    {
+      "name": "7. Отправка фотографии",
+      "request": {
+        "method": "POST",
+        "url": {
+          "raw": "https://api.vk.com/method/photos.getMessagesUploadServer",
+          "host": ["api", "vk", "com"],
+          "path": ["method", "photos.getMessagesUploadServer"]
+        },
+        "body": {
+          "mode": "urlencoded",
+          "urlencoded": [
+            {"key": "access_token", "value": "{{vk_token}}"},
+            {"key": "v", "value": "5.199"}
+          ]
+        }
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "vk_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "user_id",
+      "value": "131928387",
+      "type": "string"
+    },
+    {
+      "key": "group_id",
+      "value": "239860707",
+      "type": "string"
+    }
+  ]
+}
