@@ -22,21 +22,28 @@
             <div class="product-detail-info">
                 <h1>{{ product.name }}</h1>
 
-                <!-- Рейтинг -->
+                <!-- Рейтинг товара -->
                 <div class="product-rating-large">
                     <span class="stars-large">
                         {% with rating=average_rating|floatformat:"0" %}
                             {% for i in "12345"|make_list %}
-                                {% if forloop.counter <= rating|add:"0" %}
-                                    ★
-                                {% else %}
-                                    ☆
-                                {% endif %}
+                                {% if forloop.counter <= rating|add:"0" %}★{% else %}☆{% endif %}
                             {% endfor %}
                         {% endwith %}
                     </span>
                     <span class="rating-value-large">{{ average_rating|floatformat:1 }}</span>
                     <span class="reviews-count-large">({{ reviews_count }} отзывов)</span>
+                </div>
+
+                <!-- Like/Dislike -->
+                <div class="like-dislike-section">
+                    <button class="btn-like" data-product-id="{{ product.id }}" data-action="like">
+                        👍 <span id="likes-count">{{ product.likes }}</span>
+                    </button>
+                    <button class="btn-dislike" data-product-id="{{ product.id }}" data-action="dislike">
+                        👎 <span id="dislikes-count">{{ product.dislikes }}</span>
+                    </button>
+                    <span class="like-percent">Рейтинг: <span id="like-percent">{{ product.get_rating_percent }}%</span></span>
                 </div>
 
                 <div class="product-price-large">{{ product.price }} ₽</div>
@@ -45,55 +52,46 @@
                     <h3>Описание</h3>
                     <p>{{ product.description }}</p>
                 </div>
-
-                <button class="btn-buy-large">Добавить в корзину</button>
             </div>
         </div>
 
-        <!-- Отзывы (остается без изменений) -->
-        <div class="reviews-section">
-            <h3>Отзывы ({{ reviews_count }})</h3>
+        <!-- КОММЕНТАРИИ -->
+        <div class="reviews-section" id="comments-section">
+            <h3>Комментарии и отзывы (<span id="comments-count">{{ reviews_count }}</span>)</h3>
 
-            {% if user.is_authenticated %}
-                <div class="review-form-container">
-                    <h4>Оставить отзыв</h4>
-                    <form method="post" class="review-form">
-                        {% csrf_token %}
-                        <div class="form-group">
-                            <label>{{ form.rating.label }}</label>
-                            <div class="rating-input">
-                                {% for radio in form.rating %}
-                                    <label class="rating-option">
-                                        {{ radio.tag }} {{ radio.choice_label }}
-                                    </label>
-                                {% endfor %}
-                            </div>
+            <!-- Форма добавления комментария -->
+            <div class="review-form-container">
+                <h4>Оставить отзыв</h4>
+                <form id="comment-form" data-product-id="{{ product.id }}">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label>Оценка</label>
+                        <div class="rating-input">
+                            {% for i in "12345"|make_list %}
+                                <label class="rating-option">
+                                    <input type="radio" name="rating" value="{{ forloop.counter }}" {% if forloop.counter == 5 %}checked{% endif %}>
+                                    {{ forloop.counter }}⭐
+                                </label>
+                            {% endfor %}
                         </div>
-                        <div class="form-group">
-                            <label>{{ form.comment.label }}</label>
-                            {{ form.comment }}
-                        </div>
-                        <button type="submit" class="btn-submit-review">Отправить отзыв</button>
-                    </form>
-                </div>
-            {% else %}
-                <p class="login-to-review">
-                    <a href="{% url 'admin:login' %}?next={{ request.path }}">Войдите</a>, чтобы оставить отзыв.
-                </p>
-            {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label>Комментарий</label>
+                        <textarea id="comment-text" class="form-input" rows="3" placeholder="Напишите ваш отзыв..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn-submit-review">Отправить</button>
+                </form>
+            </div>
 
-            <div class="reviews-list">
+            <!-- Список комментариев -->
+            <div class="reviews-list" id="comments-list">
                 {% for review in reviews %}
-                    <div class="review-item">
+                    <div class="review-item" id="comment-{{ review.id }}">
                         <div class="review-header">
                             <strong class="review-user">{{ review.user.username }}</strong>
                             <span class="review-rating">
                                 {% for i in "12345"|make_list %}
-                                    {% if forloop.counter <= review.rating %}
-                                        ★
-                                    {% else %}
-                                        ☆
-                                    {% endif %}
+                                    {% if forloop.counter <= review.rating %}★{% else %}☆{% endif %}
                                 {% endfor %}
                             </span>
                             <span class="review-date">{{ review.created_at|date:"d.m.Y H:i" }}</span>
@@ -107,4 +105,148 @@
         </div>
     </div>
 </div>
+
+<script>
+const productId = {{ product.id }};
+const wsUrl = `ws://${window.location.host}/ws/chat/${productId}/`;
+let ws;
+
+function connectWebSocket() {
+    ws = new WebSocket(wsUrl);
+
+    ws.onopen = function() {
+        console.log('WebSocket connected');
+    };
+
+    ws.onmessage = function(e) {
+        const data = JSON.parse(e.data);
+        console.log('Received:', data);
+
+        if (data.type === 'comment') {
+            addComment(data);
+        }
+    };
+
+    ws.onclose = function() {
+        console.log('WebSocket disconnected, reconnecting...');
+        setTimeout(connectWebSocket, 3000);
+    };
+
+    ws.onerror = function(e) {
+        console.error('WebSocket error:', e);
+    };
+}
+
+function addComment(data) {
+    const commentsList = document.getElementById('comments-list');
+    const noReviews = commentsList.querySelector('.no-reviews');
+    if (noReviews) {
+        noReviews.remove();
+    }
+
+    const commentHtml = `
+        <div class="review-item">
+            <div class="review-header">
+                <strong class="review-user">${data.username}</strong>
+                <span class="review-rating">${'★'.repeat(data.rating)}${'☆'.repeat(5 - data.rating)}</span>
+                <span class="review-date">${data.created_at}</span>
+            </div>
+            <div class="review-comment">${data.message}</div>
+        </div>
+    `;
+
+    commentsList.insertAdjacentHTML('afterbegin', commentHtml);
+
+    const countSpan = document.getElementById('comments-count');
+    const currentCount = parseInt(countSpan.textContent);
+    countSpan.textContent = currentCount + 1;
+}
+
+// Отправка комментария
+document.getElementById('comment-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const textarea = document.getElementById('comment-text');
+    const rating = document.querySelector('input[name="rating"]:checked');
+    const message = textarea.value.trim();
+
+    if (!message) {
+        alert('Введите текст комментария');
+        return;
+    }
+
+    if (!rating) {
+        alert('Выберите оценку');
+        return;
+    }
+
+    const data = {
+        type: 'comment',
+        username: '{{ user.username }}',
+        message: message,
+        rating: parseInt(rating.value),
+        created_at: new Date().toLocaleString('ru-RU')
+    };
+
+    // Отправка через WebSocket
+    if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify(data));
+    } else {
+        // Fallback: обычный AJAX
+        fetch(`/api/comment/${productId}/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: JSON.stringify({
+                comment: message,
+                rating: parseInt(rating.value)
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                addComment({
+                    username: '{{ user.username }}',
+                    message: message,
+                    rating: parseInt(rating.value),
+                    created_at: new Date().toLocaleString('ru-RU')
+                });
+                textarea.value = '';
+            }
+        });
+    }
+
+    textarea.value = '';
+});
+
+// Like/Dislike через AJAX
+document.querySelectorAll('.btn-like, .btn-dislike').forEach(button => {
+    button.addEventListener('click', function() {
+        const action = this.dataset.action;
+        const productId = this.dataset.productId;
+
+        fetch(`/api/like/${productId}/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: JSON.stringify({ action: action })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('likes-count').textContent = data.likes;
+                document.getElementById('dislikes-count').textContent = data.dislikes;
+                document.getElementById('like-percent').textContent = data.percent + '%';
+            }
+        });
+    });
+});
+
+// Подключение WebSocket
+connectWebSocket();
+</script>
 {% endblock %}

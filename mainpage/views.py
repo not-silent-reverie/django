@@ -4,6 +4,7 @@ from django.contrib.auth import login, logout, authenticate
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
+from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from .models import Product, Review
 from .forms import RegistrationForm, LoginForm, ReviewForm, FeedbackForm
@@ -80,6 +81,7 @@ def register_view(request):
             messages.success(request, 'Регистрация успешна! Добро пожаловать!')
             return redirect('index')
         else:
+            print("Ошибки формы:", form.errors)
             messages.error(request, 'Пожалуйста, исправьте ошибки в форме')
     else:
         form = RegistrationForm()
@@ -120,7 +122,7 @@ def feedback_view(request):
             message_text = form.cleaned_data['message']
 
             try:
-                vk_message = f"""📩 НОВАЯ ЗАЯВКА С САЙТА
+                vk_message = f"""НОВАЯ ЗАЯВКА С САЙТА
 
  Имя: {name}
  Email: {email}
@@ -183,3 +185,65 @@ def vk_webhook(request):
     except Exception as e:
         print(f"Error: {e}")
         return JsonResponse({'error': str(e)}, status=400)
+
+
+@csrf_exempt
+@login_required
+def api_like(request, product_id):
+    """API для лайков/дизлайков"""
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+    try:
+        data = json.loads(request.body)
+        action = data.get('action')
+        product = Product.objects.get(id=product_id)
+
+        if action == 'like':
+            product.likes += 1
+        elif action == 'dislike':
+            product.dislikes += 1
+        else:
+            return JsonResponse({'error': 'Invalid action'}, status=400)
+
+        product.save()
+
+        return JsonResponse({
+            'success': True,
+            'likes': product.likes,
+            'dislikes': product.dislikes,
+            'percent': product.get_rating_percent()
+        })
+    except Product.DoesNotExist:
+        return JsonResponse({'error': 'Product not found'}, status=404)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+
+@csrf_exempt
+@login_required
+def api_comment(request, product_id):
+    """API для комментариев (fallback)"""
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+    try:
+        data = json.loads(request.body)
+        comment = data.get('comment')
+        rating = data.get('rating', 0)
+
+        product = Product.objects.get(id=product_id)
+
+        review = Review.objects.create(
+            product=product,
+            user=request.user,
+            rating=rating,
+            comment=comment
+        )
+
+        return JsonResponse({
+            'success': True,
+            'review_id': review.id
+        })
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)

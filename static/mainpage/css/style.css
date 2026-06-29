@@ -1051,3 +1051,56 @@ video {
         justify-content: center;
     }
 }
+
+/* ===== LIKE/DISLIKE ===== */
+.like-dislike-section {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    margin: 15px 0;
+    padding: 15px;
+    background: #f8f8f8;
+    border-radius: 10px;
+}
+
+.btn-like, .btn-dislike {
+    padding: 8px 20px;
+    border: 2px solid #ddd;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.3s;
+    background: white;
+}
+
+.btn-like:hover {
+    background: #d4edda;
+    border-color: #28a745;
+}
+
+.btn-dislike:hover {
+    background: #f8d7da;
+    border-color: #dc3545;
+}
+
+.like-percent {
+    font-weight: bold;
+    color: #333;
+    margin-left: auto;
+}
+
+/* ===== АНИМАЦИЯ КОММЕНТАРИЕВ ===== */
+.review-item {
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

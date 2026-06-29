@@ -11,5 +11,7 @@ urlpatterns = [
     path('logout/', views.logout_view, name='logout'),
     path('feedback/', views.feedback_view, name='feedback'),
     path('feedback/success/', views.feedback_success, name='feedback_success'),
-    path('vk-webhook/', views.vk_webhook, name='vk_webhook'),  # <-- Добавьте эту строку
+    path('vk-webhook/', views.vk_webhook, name='vk_webhook'),
+    path('api/like/<int:product_id>/', views.api_like, name='api_like'),
+    path('api/comment/<int:product_id>/', views.api_comment, name='api_comment'),
 ]

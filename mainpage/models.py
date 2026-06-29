@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils.text import slugify
-import os
+
 
 
 def product_image_path(instance, filename):
@@ -74,24 +74,6 @@ class Product(models.Model):
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.name)
-
-        if not self.slug:
-            self.slug = slugify(self.name)
-
-            is_new = self.pk is None
-            super().save(*args, **kwargs)
-
-            if is_new and self.image and self.image.name:
-                old_path = self.image.path
-                ext = old_path.split('.')[-1]
-                new_filename = f'products/product_{self.id}.{ext}'
-                new_path = os.path.join(os.path.dirname(old_path), new_filename)
-
-                if os.path.exists(old_path) and old_path != new_path:
-                    os.rename(old_path, new_path)
-                    self.image.name = new_filename
-                    Product.objects.filter(id=self.id).update(image=new_filename)
-
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -101,6 +83,15 @@ class Product(models.Model):
         verbose_name = "Товар"
         verbose_name_plural = "Товары"
         ordering = ['-created_at']
+
+    likes = models.PositiveIntegerField(default=0, verbose_name="Лайки")
+    dislikes = models.PositiveIntegerField(default=0, verbose_name="Дизлайки")
+
+    def get_rating_percent(self):
+        total = self.likes + self.dislikes
+        if total == 0:
+            return 50
+        return round((self.likes / total) * 100)
 
 
 class Review(models.Model):

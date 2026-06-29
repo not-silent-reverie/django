@@ -20,7 +20,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'mainpage',  # Наше приложение
+    'channels',
+    'mainpage',
 ]
 
 MIDDLEWARE = [
@@ -77,6 +78,17 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+ASGI_APPLICATION = 'webprogramming.asgi.application'
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',  # development
+        # 'BACKEND': 'channels_redis.core.RedisChannelLayer',  # prod
+        # 'CONFIG': {
+        #     "hosts": [('127.0.0.1', 6379)],
+        # },
+    },
+}
 
 # Internationalization
 LANGUAGE_CODE = 'ru-ru'
